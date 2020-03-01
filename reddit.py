@@ -10,20 +10,18 @@ Description: Search Reddit via api and praw library for keywords, package result
 import praw
 import collections
 import pandas as pd
+import json
 
 #%%
+with open('passwords.json') as f:
+  data = json.load(f)
 
-reddit = praw.Reddit(client_id='AD-EHj4oEX4DmQ',
-                     client_secret='cKfygcej8h8t7DTFekJ-iQSvurQ',
+client_id = data['reddit']['client_id']
+client_secret = data['reddit']['client_secret']
+
+reddit = praw.Reddit(client_id=client_id,
+                     client_secret=client_secret,
                      user_agent='my user agent')
-
-# %%
-my_keywords = ['test']
-
-for comment in reddit.subreddit('all').stream.comments():
-     cbody = comment.body
-     if any(keyword in cbody for keyword in my_keywords):
-         print(comment)
 
 # %%
 comments = collections.defaultdict(list)
@@ -41,8 +39,6 @@ for comment in reddit.subreddit('all').search(query='Con Edison'):
     comments['subreddit_subscribers'].append(comment.subreddit_subscribers)
     comments['created_utc'].append(comment.created_utc)
 
-
-#%%
 df = pd.DataFrame.from_dict(comments)
 
 
